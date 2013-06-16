@@ -1,0 +1,19 @@
+{
+  "name": "arduinoSerialAdaptor",
+  "version": "0.0.0",
+  "description": "ERROR: No README.md file found!",
+  "main": "index.js",
+  "dependencies": {
+    "serialport2": "~0.0.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@@github.com:timbit123/arduinoSerialAdaptor.git"
+  },
+  "author": "",
+  "license": "BSD"
+}
