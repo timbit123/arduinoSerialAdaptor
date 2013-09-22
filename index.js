@@ -12,28 +12,17 @@ function Arduino(port) {
 	var theString = "";
 	serial.on('data', function(data) {
 		theString += data.toString();
-		
-		if (theString.indexOf('\n') != -1) {
-			var split = theString.split('\n'); 
-			var line = split[0];
-			theString = split[1];
-			
-			//sensors values
-			if (line.charAt(0) == 'i') {
-				line = line.substring(1, line.length - 2);
-				self.sensorStream.emit('sensor', line.split(','));
-			}
-			//Motor Armed
-			else if(line.charAt(0) == 'A'){
-				self.sensorStream.emit('motorArmed', line.charAt(1) == '1');
-			}
-			
-			//Motor value message
-			else if(line.charAt(0) == 'M')
-			{
-				self.sensorStream.emit('message' line.substring(1, line.length - 1));
-			}
 
+		if (theString.indexOf('\r\n') != -1) {
+			var split = theString.split('\r\n');
+			parseString(self, split[0]);
+			if (split.length == 3) {
+				parseString(self, split[1]);
+				theString = "";
+			} else {
+				theString = split[1];
+			}
+		}
 	});
 
 	serial.on('error', function(err) {
@@ -50,22 +39,51 @@ function Arduino(port) {
 
 Arduino.prototype.activateSensorValues = function() {
 	serial.write('i');
-}
+};
 Arduino.prototype.deactivateSensorValues = function() {
 	serial.write('x');
-}
+};
 
-Arduino.prototype.armMotor = function()
-{
+Arduino.prototype.armMotor = function() {
 	serial.write('A1');
-}
+};
 
-Arduino.prototype.dearmMotor = function()
-{
+Arduino.prototype.dearmMotor = function() {
 	serial.write('A0');
-}
+};
 
 Arduino.prototype.sendMotorValues = function(values) {
-	serial.write('M' + values.join(';'));
+
+	serial.write('M' + values.join(';') + ";");
+};
+
+Arduino.prototype.sendReceiverCommands = function(values)
+{
+	serial.write('R'+ values.join(';') + ';');
+};
+
+Arduino.prototype.sendCalibration = function() {
+	serial.write('C');
+};
+Arduino.prototype.sendPulse = function(nbPulse) {
+	serial.write('P' + nbPulse +";");
+};
+function parseString(arduino, text) {
+	//sensors values
+	if (text.charAt(0) == 'i') {
+		text = text.substring(1, text.length - 1);
+		arduino.sensorStream.emit('sensor', text.split(','));
+	}
+	//Motor Armed
+	else if (text.charAt(0) == 'A') {
+		arduino.sensorStream.emit('motorArmed', text.charAt(1) == '1');
+	}
+
+	//Motor value message
+	else if (text.charAt(0) == 'M') {
+		arduino.sensorStream.emit('message', text.substring(1, text.length));
+	}
+
 }
+
 module.exports = Arduino;
