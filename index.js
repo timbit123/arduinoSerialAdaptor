@@ -59,6 +59,7 @@ Arduino.prototype.sendMotorValues = function(values) {
 
 Arduino.prototype.sendReceiverCommands = function(values)
 {
+	console.log('R'+ values.join(';') + ';');
 	serial.write('R'+ values.join(';') + ';');
 };
 
